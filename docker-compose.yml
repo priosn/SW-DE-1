@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  app_flask:
+    container_name: app_flask
+    build: app/
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      # DATABASE_URL: [BD_TYPE]+[DB_CONNECTOR]://[USERNAME]:[PASSWORD]@[CONTAINER_NAME]:[PORT]/[BD_NAME]
+      DATABASE_URL: 'mysql://${USER_DB}:${PASSWORD_DB}@db_mysql:3306/${NAME_DB}'
+    volumes:
+      - ./app:/app
+    networks:
+      - net
+
+  db_mysql:
+    container_name: db_mysql
+    # MySQL 5.7 Image
+    image: mysql:5.7
+    restart: always
+    environment:
+      # Set database
+      MYSQL_DATABASE: ${NAME_DB}
+      MYSQL_ROOT_PASSWORD: ${PASSWORD_DB}
+    ports:
+      - "3306:3306"
+    volumes:
+      # Make database persistent using a volume
+      - mysql:/var/lib/mysql
+    networks:
+      - net
+
+networks:
+  net:
+
+volumes:
+  mysql:
